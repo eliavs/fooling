@@ -1,0 +1,12 @@
+name: fooling
+title: fooling
+username:
+account: eliavs
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 15860
+bundleId: 1384617
+url: https://eliavs.shinyapps.io/fooling/
+when: 1526905610.09289
+asMultiple: FALSE
+asStatic: FALSE
