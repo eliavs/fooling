@@ -1,3 +1,8 @@
+from polyglot.downloader import downloader
+print(downloader.supported_languages_table("ner2", 3))
+import logging
+logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.debug('This message should go to the log file')
 def places(tab):
     from polyglot.text import Text
     places = []
@@ -5,11 +10,13 @@ def places(tab):
     text_place = ''
     all_places = ''
     for place in first_album['word']:
-        place + all_places
         try:
+            print(place)
             pl = Text(place).entities
+            logging.debug(pl)
         except Exception as e:
-            print(e)
+           # print(e)
+           #logging.debug(e)
             continue
         try:
             if pl[0].tag == 'I-LOC':
