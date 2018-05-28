@@ -1,13 +1,17 @@
-Sys.setlocale(category = "LC_ALL", locale = "hebrew")
+#Sys.setlocale(category = "LC_ALL", locale = "hebrew")
 #reticulate::use_virtualenv('/home/fooling', required = TRUE)
+Sys.setenv(RETICULATE_PYTHON = "/usr/bin/python3.5")
+print("here")
 library(shiny)
 library(rgdal)
 library(akima) 
 library(reshape2)
 library(ggmap)
 library(raster)
+
 library(reticulate)
 library(tidyverse)
+print("here2")
 library(tidytext)
 options(shiny.maxRequestSize = -1)
 # Define server logic required to summarize and view the selected dataset
@@ -20,7 +24,7 @@ source_python("ent.py", convert = TRUE)
     if(input$need_proj=="text"){
 	Sys.setlocale(category = "LC_ALL", locale = "hebrew")
       bugs <- read.csv(input$bugs$datapath, header=FALSE, sep=",",fileEncoding="iso-8859-8", stringsAsFactors =F)
-	 bugs<-cbind(enc2utf8(as.vector(bugs[,1])),bugs[,2])
+	 ugs<-cbind(enc2utf8(as.vector(bugs[,1])),bugs[,2])
      #bugs<-iconv(bugs,"iso-8859-8","UTF-8")
     }
     else
@@ -64,12 +68,14 @@ source_python("ent.py", convert = TRUE)
 	#d <- as.tibble(data)
    b<- unique(unlist(strsplit(as.character(data[[1]]), " "))) %>% as.tibble
    names(b) <- "word"
-  d <- anti_join(b, stop_words) %>% py$places()
-	tab <- sapply(d[[2]], function(x) as.character(x$parent))
-	foo <- geocode(tab)
-	bar <- cbind(tab,foo)
-	names(bar)<-c("V1", "V2","V3")
-	return(bar)
+  d <- anti_join(b, stop_words) # %>% py$places()
+  foo <-d %>% py$places()
+  tab <- sapply(foo[[2]], function(x) as.character(x$parent))
+if (length(tab) <1) return(data.frame("empty"))
+	#foo <- tryCatch(geocode(tab), finaly = c(0,0))
+	#bar <- cbind(tab,foo)
+	#names(bar)<-c("V1", "V2","V3")
+	return(tab)
 	}
   })
   # Shows a table of the conversion parameters
