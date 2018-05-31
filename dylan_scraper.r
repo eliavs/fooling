@@ -40,10 +40,22 @@ for (i in 1:36){
   print(album_names[i])
 }
 
-sapply(album_names, FUN = function(x) print(get(x)$lyric))
-tab <- unlist(sapply(album_names, FUN = function(x) get(x)$lyric)) %>%
-  as.tibble %>%
-    unnest_tokens(word,value) %>%
-    anti_join(stop_words) %>% py$places()
-flat_places <- sapply(place[[2]], function(x) as.character(x$parent))
-print(flat_places)
+df <- data.frame()
+for (disk in complex_structure){
+  for (song in disk$lyric){
+    song_words <- unlist(song) %>% as.tibble() %>% unnest_tokens(word, value) %>% anti_join(stop_words) %>% unique() %>% py$places()
+    placed_words <- sapply(song_words[[2]], function(x) as.character(x$parent))
+    if(length(placed_words) >0){
+      df <- rbind(df, data.frame(placed_words))
+    }
+  }
+}
+print(df)
+barplot(sort(table(df)), col=rgb(0.2,0.4,0.6,0.6), horiz=T , las=1)
+#sapply(album_names, FUN = function(x) print(get(x)$lyric))
+#tab <- unlist(sapply(album_names, FUN = function(x) get(x)$lyric)) %>%
+#  as.tibble %>%
+#    unnest_tokens(word,value) %>%
+#    anti_join(stop_words) %>% py$places()
+#flat_places <- sapply(place[[2]], function(x) as.character(x$parent))
+#print(flat_places)
