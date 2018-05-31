@@ -1,16 +1,16 @@
 import sys
-print(sys.version)
-import polyglot
-from polyglot.downloader import downloader
-downloader.download("embeddings2.en")
-print(downloader.supported_languages_table("ner2", 3))
+print(sys)
 import logging
+from polyglot.downloader import downloader
+import polyglot
+#print(downloader.supported_languages_table("ner2", 3))
+print(polyglot.polyglot_path)
 logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.debug(sys.version)
+logging.debug(polyglot.polyglot_path)
 logging.debug('This message should go to the log file')
 def places(tab):
     from polyglot.text import Text
-    bla = downloader._downloader._collections["en"]
-    print(bla.children)
     places = []
     first_album = tab
     text_place = ''
