@@ -81,13 +81,14 @@ complex_structure <- sapply(album_names, FUN = function(x) get(x))
 songs_df = data.frame(album = character(), track_title = character(), place = character())
 for (y in 1:length(complex_structure)){
   disk_name <- names(complex_structure[y])
+  if (is.null(complex_structure[y])){next}
   for (i in 1:nrow(complex_structure[[y]])){
     structered <- unlist(complex_structure[[y]][i,]$lyric) %>% as.tibble() %>% unnest_tokens(word, value) %>% anti_join(stop_words) %>% unique()
     tryCatch(
       placed <- py$places(structered),finally = print("error"))
     if (placed[1] != 'error'){
       for (item in placed[[2]])
-        songs_df = rbind(songs_df, data.frame(disk_name, complex_structure[[1]][i,]$track_title, as.character(item$parent)))
+        songs_df = rbind(songs_df, data.frame(disk_name, complex_structure[[y]][i,]$track_title, as.character(item$parent)))
       print(class(item$parent))
     }
   }
