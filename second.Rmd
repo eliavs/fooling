@@ -1,0 +1,61 @@
+---
+title: "ניתוח טקסטים ספרותיים בעזרת כלים מרחביים "
+output: ioslides_presentation
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+load("dylan_disk_places_GEOD.RData")
+```
+
+## הקדמה
+פה אספר על הרעיון, ובכללי על הכלים
+
+## Web Scraping
+- data from wkipedia
+```{r, out.width = "100px"}
+knitr::include_graphics("discogrphy.png")
+```
+- data from wikipedia
+#![Caption for the picture.](discogrphy.png){: height="50px" width="50px"}
+
+## Web Scraping - cont
+- Genius
+- Bullet 3
+
+## data munging
+- bullet 1
+
+## NLP Name Entity Recognition
+- Python
+
+## Interactive Table
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(shiny)
+library(DT)
+ shinyApp(
+     ui = fluidPage(DTOutput('tbl')),
+     server = function(input, output) {
+         output$tbl = renderDT(
+             songs_df, options = list(lengthChange = FALSE)
+         )
+     }
+ )
+```
+
+## Geocode
+
+
+## Slide with map
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(leaflet)
+m <- leaflet() %>%
+   addTiles() %>%  # Add default OpenStreetMap map tiles
+   addMarkers(lng=geoed_songs_df$`geocoded$lon`, lat=geoed_songs_df$`geocoded$lat`, popup=paste("album: ", geoed_songs_df$album, "\nsong: ",geoed_songs_df$track_title))
+
+m
+```
+
