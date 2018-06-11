@@ -1,17 +1,21 @@
 #Sys.setlocale(category = "LC_ALL", locale = "hebrew")
+
+if(Sys.info()["sysname"] %in% "Windows"){
+  Sys.setenv(RETICULATE_PYTHON = "C:/Users/eliavsc/AppData/Local/Programs/Python/Python36-32/python.exe")
+}
+  
 #reticulate::use_virtualenv('/home/fooling', required = TRUE)
-Sys.setenv(RETICULATE_PYTHON = "/usr/bin/python3.5")
-print("here")
+#Sys.setenv(RETICULATE_PYTHON = "/usr/bin/python3.5")
 library(shiny)
 library(rgdal)
 library(akima) 
 library(reshape2)
 library(ggmap)
 library(raster)
-
+library(readr)
 library(reticulate)
 library(tidyverse)
-print("here2")
+library(nominatim)
 library(tidytext)
 options(shiny.maxRequestSize = -1)
 # Define server logic required to summarize and view the selected dataset
@@ -24,11 +28,12 @@ source_python("ent.py", convert = TRUE)
     if(input$need_proj=="text"){
 	Sys.setlocale(category = "LC_ALL", locale = "hebrew")
       bugs <- read.csv(input$bugs$datapath, header=FALSE, sep=",",fileEncoding="iso-8859-8", stringsAsFactors =F)
-	 ugs<-cbind(enc2utf8(as.vector(bugs[,1])),bugs[,2])
+	 bugs<-cbind(enc2utf8(as.vector(bugs[,1])),bugs[,2])
      #bugs<-iconv(bugs,"iso-8859-8","UTF-8")
     }
     else
-      bugs <- read.csv(input$bugs$datapath, header=FALSE)
+      bugs <- read_delim(input$bugs$datapath,delim = ',', col_names = F, n_max = 100000)
+     
   })
   #this is the search bar
   datasetInput <- reactive({
@@ -52,9 +57,11 @@ source_python("ent.py", convert = TRUE)
     if(input$need_proj=="latlon")
       return(data)
     if(input$need_proj=="projected"){
+      print(head(data))
       foo<-project(as.matrix(data[1:2]),converted(), inv=T)
+      print(foo)
       foo<-cbind(foo,data[3])
-      names(foo)<-names(data)
+      names(foo)<-c("V1", "V2","V3")
       return(foo)
     }
     if(input$need_proj=="text"){
@@ -94,10 +101,11 @@ if (length(tab) <1) return(data.frame("empty"))
     print(data)
     print(class(data))
     print(class(data$V2))
-    if (length(data[1])==1) {
+    if (nrow(data)==1) {
       p <- ggmap(get_map(location = c(lon = as.numeric(data$V2),lat= as.numeric(data$V3)), zoom = 'auto',maptype="roadmap"))
     }
     else
+  
         p<-ggmap(get_map(location = c(left = min(data$V1), bottom = min(data$V2), right =max(data$V1) , top = max(data$V2)),maptype="roadmap"))
     v<-p+geom_point(aes(x=V1, y=V2, colour = V3, size=V3),data=data, alpa=0.5)+ scale_colour_gradient(low = "blue", high="red")
     kml()
