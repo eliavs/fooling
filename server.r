@@ -6,6 +6,7 @@ if(Sys.info()["sysname"] %in% "Windows"){
   
 #reticulate::use_virtualenv('/home/fooling', required = TRUE)
 #Sys.setenv(RETICULATE_PYTHON = "/usr/bin/python3.5")
+library(leaflet)
 library(shiny)
 library(rgdal)
 library(akima) 
@@ -17,6 +18,7 @@ library(reticulate)
 library(tidyverse)
 library(nominatim)
 library(tidytext)
+library(leaflet)
 options(shiny.maxRequestSize = -1)
 # Define server logic required to summarize and view the selected dataset
 shinyServer(function(input, output,session) {
@@ -99,6 +101,9 @@ if (length(tab) <1) return(data.frame("empty"))
   plotdatamap<-reactive({
     data<-converted_data()
     print(data)
+    m <- leaflet() %>% addProviderTiles(providers$Stamen.Watercolor) %>%
+      addMarkers(lng=data$V1, lat=data$V2, popup=paste("hello"))
+    
     print(class(data))
     print(class(data$V2))
     if (nrow(data)==1) {
@@ -109,7 +114,7 @@ if (length(tab) <1) return(data.frame("empty"))
         p<-ggmap(get_map(location = c(left = min(data$V1), bottom = min(data$V2), right =max(data$V1) , top = max(data$V2)),maptype="roadmap"))
     v<-p+geom_point(aes(x=V1, y=V2, colour = V3, size=V3),data=data, alpa=0.5)+ scale_colour_gradient(low = "blue", high="red")
     kml()
-    print(v)
+    return(m)
   })
   #######contour map
   countourmap <- reactive({
@@ -135,7 +140,7 @@ if (length(tab) <1) return(data.frame("empty"))
     coordinates(data)<-c("V1","V2")
     proj4string(data)<-CRS("+init=epsg:4326")
     bb_ll<-spTransform(data,CRS("+proj=longlat +datum=WGS84"))
-    bb_ll<-writeOGR(bb_ll,"data.kml","V3","KML")
+    bb_ll<-writeOGR(bb_ll,paste(gsub('-', "_",Sys.Date()),"data.kml", sep = "_"),"V3","KML")
     return(bb_ll)
   })
   #######download point data as KML
@@ -149,8 +154,8 @@ if (length(tab) <1) return(data.frame("empty"))
       file.copy("contour.kmz",file)
     })
   ###########show data map 
-  output$datamap<-renderPlot({
-    print(plotdatamap())
+  output$datamap<-renderLeaflet({
+    plotdatamap()
   })
   ####download data map
   output$downloaddatamap <- downloadHandler(
