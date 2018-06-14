@@ -1,5 +1,6 @@
 options(encoding = 'UTF-8')
 library(shiny)
+library(leaflet)
 userdata <- list('Upload a file'=c(1))
 # Define UI for dataset viewer application
 shinyUI(pageWithSidebar(
@@ -29,7 +30,7 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       tabPanel("proj",verbatimTextOutput("view")),
       tabPanel( "data",tableOutput('contents'),downloadButton("downloaddata", "download the data")),
-      tabPanel("datamap",plotOutput('datamap'),downloadButton('downloaddatamap',"Download map"),downloadButton("downloaddatamapkml","download as kml")),
+      tabPanel("datamap",leafletOutput('datamap'),downloadButton('downloaddatamap',"Download map"),downloadButton("downloaddatamapkml","download as kml")),
       tabPanel( "map", plotOutput('map'),downloadButton('downloadmap', 'Download map'),downloadButton("downloadmapkml","download as kml"))
     )
   )
